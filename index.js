@@ -4,7 +4,7 @@ const rate = require("express-rate-limit")
 const cors = require('cors');
 const app = express();
 const db = require("./database")
-app.use(cors({ origin: 'https://testfinal-production.up.railway.app/', credentials: true }));
+app.use(cors({ origin: 'https://testfinal-production.up.railway.app:8080/', credentials: true }));
 app.use(express.json());
 app.use(session({
   secret: 'a9a7A6A7',
