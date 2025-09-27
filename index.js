@@ -1,24 +1,40 @@
-const express = require('express');
+const express = require('express')
 const session = require('express-session')
-const RedisStore = require('connect-redis')(session)
-const redis = require('redis')
-const rate = require("express-rate-limit")
-const cors = require('cors');
-const app = express();
-const db = require("./database")
-const redisClient = redis.createClient({
+const RedisStore = require('connect-redis').default
+const { createClient } = require('redis')
+const rate = require('express-rate-limit')
+const cors = require('cors')
+const db = require('./database')
+
+const app = express()
+
+const redisClient = createClient({
   url: 'redis://default:tFBRcqRXLGiMWYJfEaIvwcsqCUgFTpEY@gondola.proxy.rlwy.net:45377'
 })
 
-app.use(cors({ origin: 'https://testfinal-production.up.railway.app', credentials: true }));
-app.use(express.json());
+redisClient.on('error', err => console.error('Redis Client Error', err))
+redisClient.connect()
+
+app.use(cors({
+  origin: 'https://testfinal-production.up.railway.app',
+  credentials: true
+}))
+
+app.use(express.json())
+
 app.use(session({
-  store: new RedisStore({ client : redisClient }),
+  store: new RedisStore({ client: redisClient }),
   secret: 'a9a7A6A7',
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true }
+  saveUninitialized: false,
+  cookie: {
+    secure: true,
+    httpOnly: true
+  }
 }))
+
+
+
 
 app.use("/", (req, res, next) =>{
   const isFetch = req.headers['sec-fetch-mode'] === 'cors' || req.headers['x-requested-with'] === 'XMLHttpRequest';
