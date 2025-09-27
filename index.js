@@ -6,21 +6,44 @@ const app = express();
 const db = require("./database")
 
 const RedisStore = require('connect-redis').default;
-const redisClient = createClient();
-await redisClient.connect();
+const { createClient } = require('redis');
 
 app.use(cors({ origin: 'https://testfinal-production.up.railway.app', credentials: true }));
 
-const RedisStore = require('connect-redis').default;
-const redisClient = createClient();
-await redisClient.connect();
+async function setupSession() {
+  const redisClient = createClient({
+    url: 'redis://default:tFBRcqRXLGiMWYJfEaIvwcsqCUgFTpEY@gondola.proxy.rlwy.net:45377' // or your Railway Redis plugin URL
+  });
 
-app.use(session({
-  store: new RedisStore({ client: redisClient }),
-  secret: 'a9a7A6A7',
-  resave: false,
-  saveUninitialized: false
-}))
+  await redisClient.connect();
+
+  app.use(session({
+    store: new RedisStore({ client: redisClient }),
+    secret: 'SEees',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: true } // set to true if using HTTPS
+  }));
+
+  // Your routes here
+  app.get('/', (req, res) => {
+    res.send('Session is working');
+  });
+
+  const PORT = 3005;
+  app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+}
+
+setupSession().catch(err => {
+  console.error('Failed to set up session:', err);
+});
+
+// app.use(session({
+//   store: new RedisStore({ client: redisClient }),
+//   secret: 'a9a7A6A7',
+//   resave: false,
+//   saveUninitialized: false
+// }))
 
 // app.use("/", (req, res, next) =>{
 //   const isFetch = req.headers['sec-fetch-mode'] === 'cors' || req.headers['x-requested-with'] === 'XMLHttpRequest';
@@ -104,7 +127,7 @@ app.use(session({
 // })
 
 
-app.listen(3005, () => console.log('Server running on port 3005'));
+// app.listen(3005, () => console.log('Server running on port 3005'));
 
 
 
