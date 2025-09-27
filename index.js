@@ -5,7 +5,7 @@ const cors = require('cors');
 const app = express();
 const db = require("./database")
 
-const RedisStore = require('connect-redis').default;
+const { RedisStore } = require('connect-redis').default;
 const { createClient } = require('redis');
 
 app.use(cors({ origin: 'https://testfinal-production.up.railway.app', credentials: true }));
