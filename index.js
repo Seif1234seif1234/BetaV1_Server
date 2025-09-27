@@ -1,12 +1,19 @@
 const express = require('express');
 const session = require('express-session')
+const RedisStore = require('connect-redis')(session)
+const redis = require('redis')
 const rate = require("express-rate-limit")
 const cors = require('cors');
 const app = express();
 const db = require("./database")
+const redisClient = redis.createClient({
+  url: 'redis://default:tFBRcqRXLGiMWYJfEaIvwcsqCUgFTpEY@gondola.proxy.rlwy.net:45377'
+})
+
 app.use(cors({ origin: 'https://testfinal-production.up.railway.app', credentials: true }));
 app.use(express.json());
 app.use(session({
+  store: new RedisStore({ client : redisClient }),
   secret: 'a9a7A6A7',
   resave: false,
   saveUninitialized: true,
